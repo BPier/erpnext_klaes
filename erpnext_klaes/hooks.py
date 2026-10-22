@@ -99,6 +99,15 @@ required_apps = ["erpnext"]
 # before_install = "erpnext_klaes.install.before_install"
 # after_install = "erpnext_klaes.install.after_install"
 
+# Fixtures
+# --------
+# Records shipped with the app, in erpnext_klaes/fixtures/, imported on install-app and migrate.
+# Custom Fields of this app (module "Erpnext Klaes"): "Klaes Doc Number" on Quotation and Sales Order.
+# After changing them in Customize Form: bench --site <site> export-fixtures --app erpnext_klaes
+fixtures = [
+	{"dt": "Custom Field", "filters": [["module", "=", "Erpnext Klaes"]]},
+]
+
 # Uninstallation
 # ------------
 
@@ -277,4 +286,3 @@ required_apps = ["erpnext"]
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-

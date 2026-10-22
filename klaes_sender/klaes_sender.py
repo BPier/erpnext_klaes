@@ -38,7 +38,7 @@ SAMPLE_FILE = os.path.join(APP_FOLDER, "sample_order.json")
 
 logging.basicConfig(
 	filename=LOG_FILE,
-	level=logging.info,
+	level=logging.INFO,
 	format="%(asctime)s  %(levelname)s  %(message)s",
 )
 logger = logging.getLogger("klaes_sender")

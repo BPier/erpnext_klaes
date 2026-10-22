@@ -1,0 +1,36 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Quotation",
+  "fieldname": "klaes_doc_number",
+  "fieldtype": "Data",
+  "in_standard_filter": 1,
+  "insert_after": "customer_name",
+  "is_system_generated": 0,
+  "label": "Klaes Doc Number",
+  "modified": "2026-10-22 16:20:00.000000",
+  "module": "Erpnext Klaes",
+  "name": "Quotation-klaes_doc_number",
+  "no_copy": 0,
+  "read_only": 1,
+  "search_index": 1
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Sales Order",
+  "fieldname": "klaes_doc_number",
+  "fieldtype": "Data",
+  "in_standard_filter": 1,
+  "insert_after": "customer_name",
+  "is_system_generated": 0,
+  "label": "Klaes Doc Number",
+  "modified": "2026-10-22 16:20:00.000000",
+  "module": "Erpnext Klaes",
+  "name": "Sales Order-klaes_doc_number",
+  "no_copy": 0,
+  "read_only": 1,
+  "search_index": 1
+ }
+]

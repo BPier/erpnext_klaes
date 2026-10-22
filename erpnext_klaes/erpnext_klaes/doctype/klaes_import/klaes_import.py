@@ -5,9 +5,13 @@ How it works:
 1. klaes_sender.exe creates a Klaes Import record (standard Frappe REST API).
 2. After the record is saved, process_import() runs in the background.
 3. process_import() creates the documents in ERPNext and sets the status:
-   - Done:  everything was created (see the "Sales Order" field)
+   - Done:  everything was created (see the "Quotation" or "Sales Order" field)
    - Error: something failed (see the "Error Message" field),
             fix the cause, then click "Process again".
+
+Which document is created depends on "doc_type" in the Klaes JSON:
+   - "Quotation" -> draft Quotation   (doc_number must start with "Q", e.g. Q241023-001A)
+   - "Order"     -> draft Sales Order (doc_number must start with "O", e.g. O260909-0201)
 """
 
 import json
@@ -15,6 +19,12 @@ import json
 import frappe
 from frappe.model.document import Document
 from frappe.utils import today
+
+# Klaes "doc_type" -> first letter that its "doc_number" must start with
+DOC_NUMBER_PREFIX = {
+	"Quotation": "Q",
+	"Order": "O",
+}
 
 
 class KlaesImport(Document):
@@ -37,8 +47,23 @@ def process_import(import_name):
 	# If anything fails, undo everything created during this processing
 	frappe.db.savepoint("klaes_import")
 	try:
-		sales_order = create_draft_sales_order(klaes_import)
-		klaes_import.db_set({"status": "Done", "sales_order": sales_order, "error_message": ""})
+		document = read_klaes_document(klaes_import)
+		doc_type, doc_number = check_doc_type_and_number(document)
+
+		if doc_type == "Quotation":
+			result = {"quotation": create_draft_quotation(klaes_import.customer, document)}
+		else:
+			result = {"sales_order": create_draft_sales_order(klaes_import.customer, document)}
+
+		klaes_import.db_set(
+			{
+				"status": "Done",
+				"doc_type": doc_type,
+				"doc_number": doc_number,
+				"error_message": "",
+				**result,
+			}
+		)
 
 	except Exception as error:
 		frappe.db.rollback(save_point="klaes_import")
@@ -47,41 +72,81 @@ def process_import(import_name):
 		frappe.log_error(title=f"Klaes Import {import_name} failed")
 
 
-def create_draft_sales_order(klaes_import):
-	"""
-	STEP 1: create a Sales Order with the items of the Klaes JSON,
-	saved as DRAFT only (never submitted).
-
-	The items must ALREADY EXIST in ERPNext: the Item Code is "SAP_Item_Number"
-	in the JSON. (Creating new items is a later step.)
-
-	Returns the name of the new Sales Order.
-	"""
+def read_klaes_document(klaes_import):
+	"""Check the Klaes Import and return the "Document" part of its JSON."""
 	if not klaes_import.customer:
 		frappe.throw("No customer on this Klaes Import.")
 
 	if not klaes_import.json_data:
 		frappe.throw("No JSON data on this Klaes Import.")
 
-	document = json.loads(klaes_import.json_data)["Document"]
+	return json.loads(klaes_import.json_data)["Document"]
 
+
+def check_doc_type_and_number(document):
+	"""
+	Return (doc_type, doc_number) from the Klaes JSON, after checking that they agree:
+	a "Quotation" number starts with "Q", an "Order" number starts with "O".
+	"""
+	doc_type = (document.get("doc_type") or "").strip()
+	doc_number = (document.get("doc_number") or "").strip()
+
+	if doc_type not in DOC_NUMBER_PREFIX:
+		expected = " or ".join(DOC_NUMBER_PREFIX)
+		frappe.throw(f"Unknown Klaes document type '{doc_type}' (expected {expected}).")
+
+	prefix = DOC_NUMBER_PREFIX[doc_type]
+	if not doc_number.startswith(prefix):
+		frappe.throw(
+			f"Klaes document type '{doc_type}' does not match document number '{doc_number}' "
+			f"(a {doc_type} number must start with '{prefix}')."
+		)
+
+	return doc_type, doc_number
+
+
+def create_draft_quotation(customer, document):
+	"""Create a Quotation with the items of the Klaes JSON, saved as DRAFT. Returns its name."""
+	quotation = frappe.new_doc("Quotation")
+	quotation.quotation_to = "Customer"
+	quotation.party_name = customer
+	quotation.transaction_date = today()
+	quotation.klaes_doc_number = document["doc_number"].strip()
+	add_items(quotation, document)
+
+	# insert() only saves the draft. Do NOT call submit() here.
+	quotation.insert()
+	return quotation.name
+
+
+def create_draft_sales_order(customer, document):
+	"""Create a Sales Order with the items of the Klaes JSON, saved as DRAFT. Returns its name."""
 	order = frappe.new_doc("Sales Order")
-	order.customer = klaes_import.customer
+	order.customer = customer
 	order.transaction_date = today()
 	order.delivery_date = today()
+	order.klaes_doc_number = document["doc_number"].strip()
+	add_items(order, document)
 
+	# insert() only saves the draft. Do NOT call submit() here.
+	order.insert()
+	return order.name
+
+
+def add_items(erpnext_document, document):
+	"""
+	Add one line per item of the Klaes JSON to a Quotation or Sales Order.
+
+	The items must ALREADY EXIST in ERPNext: the Item Code is "SAP_Item_Number"
+	in the JSON. (Creating new items is a later step.)
+	"""
 	for klaes_item in document.get("item", []):
 		item_code = klaes_item["SAP_Item_Number"]
 		if not frappe.db.exists("Item", item_code):
 			frappe.throw(f"Item '{item_code}' does not exist in ERPNext.")
 
 		# ERPNext fills in the rest (name, unit, price, warehouse...) when saving
-		order.append("items", {"item_code": item_code, "qty": klaes_item["quantity"]})
+		erpnext_document.append("items", {"item_code": item_code, "qty": klaes_item["quantity"]})
 
-	if not order.items:
+	if not erpnext_document.items:
 		frappe.throw("The Klaes JSON has no items.")
-
-	# insert() only saves the draft. Do NOT call order.submit() here.
-	order.insert()
-
-	return order.name
