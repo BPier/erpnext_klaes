@@ -48,7 +48,6 @@ class IntegrationTestKlaesImport(IntegrationTestCase):
 			"customer_name",
 			{
 				"customer_name": "_Test Klaes Customer",
-				# "customer_group": "All Customer Groups",
 				"territory": "All Territories",
 			},
 		)

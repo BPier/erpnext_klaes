@@ -38,15 +38,19 @@ SAMPLE_FILE = os.path.join(APP_FOLDER, "sample_order.json")
 
 logging.basicConfig(
 	filename=LOG_FILE,
-	level=logging.INFO,
+	level=logging.info,
 	format="%(asctime)s  %(levelname)s  %(message)s",
 )
+logger = logging.getLogger("klaes_sender")
 
+
+class KlaesSenderError(Exception):
+	"""An error in klaes_sender: the message is written to klaes_sender.log."""
 
 def read_config():
 	"""Read config.ini and return the [erpnext] section."""
 	if not os.path.exists(CONFIG_FILE):
-		raise Exception(
+		raise KlaesSenderError(
 			f"Config file not found: {CONFIG_FILE}. "
 			"Copy config.example.ini to config.ini and fill in your settings."
 		)
@@ -93,13 +97,13 @@ def create_record(settings, doctype, data):
 	except urllib.error.HTTPError as error:
 		# ERPNext answered with an error: put its message in the log
 		details = error.read().decode("utf-8", errors="replace")
-		raise Exception(f"ERPNext refused the request (HTTP {error.code}): {details}")
+		raise KlaesSenderError(f"ERPNext refused the request (HTTP {error.code}): {details}")
 
 	return answer["data"]["name"]
 
 
 def main():
-	logging.info("---- klaes_sender started ----")
+	logger.info("---- klaes_sender started ----")
 	try:
 		settings = read_config()
 
@@ -108,7 +112,7 @@ def main():
 		else:
 			# No file given: send the test file next to the program
 			file_path = SAMPLE_FILE
-		logging.info(f"File: {file_path}")
+		logger.info(f"File: {file_path}")
 		doc_number, content = read_klaes_file(file_path)
 
 		record_name = create_record(
@@ -122,12 +126,12 @@ def main():
 			},
 		)
 
-		logging.info(f"Klaes Import created: {record_name} ({doc_number})")
+		logger.info(f"Klaes Import created: {record_name} ({doc_number})")
 		print(f"Klaes Import created: {record_name} ({doc_number})")
 		return 0
 
 	except Exception as error:
-		logging.error(str(error))
+		logger.error(str(error))
 		print(f"ERROR: {error}")
 		return 1
 
