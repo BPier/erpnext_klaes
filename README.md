@@ -7,7 +7,7 @@ This repository contains two parts:
 | Folder | Runs on | What it is |
 |---|---|---|
 | `erpnext_klaes/` | ERPNext server | The Frappe app, with one DocType: **Klaes Import**. |
-| `klaes_sender/` | Windows Server 2019 (Klaes machine) | A small program, `klaes_sender.exe`, that Klaes runs after exporting a JSON file. |
+| `klaes_sender/` | Windows Server 2019 (Klaes machine) or any machine that run python3 | A small program, `klaes_sender.exe`, that Klaes runs after exporting a JSON file. |
 
 ```
 erpnext_klaes/                       ← this repository (branch version-16)
