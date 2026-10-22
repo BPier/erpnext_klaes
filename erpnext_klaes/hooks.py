@@ -8,7 +8,8 @@ app_license = "mit"
 # Apps
 # ------------------
 
-# required_apps = []
+# This app creates ERPNext documents (Sales Orders...), so ERPNext must be installed
+required_apps = ["erpnext"]
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [

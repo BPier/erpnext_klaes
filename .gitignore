@@ -53,3 +53,12 @@ jspm_packages/
 
 # Aider AI Chat
 .aider*
+
+# klaes_sender: real settings contain the API secret, never commit them
+klaes_sender/config.ini
+klaes_sender/klaes_sender.log
+
+# klaes_sender: PyInstaller output
+klaes_sender/build/
+klaes_sender/dist/
+klaes_sender/*.spec
