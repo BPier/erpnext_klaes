@@ -4,7 +4,8 @@ klaes_sender - sends a Klaes JSON file to ERPNext.
 Usage (Klaes runs this after generating the JSON file):
     klaes_sender.exe "C:\\path\\to\\file.JSON"
 
-Without a file path, it sends a TEST import (useful to check the connection).
+Without a file path, it sends sample_order.json (next to the program),
+useful to test the connection. Edit it so it uses an item that exists in ERPNext.
 
 The program creates a "Klaes Import" record in ERPNext with the standard
 Frappe REST API. ERPNext then processes it (creates the draft Sales Order).
@@ -33,6 +34,7 @@ else:
 
 CONFIG_FILE = os.path.join(APP_FOLDER, "config.ini")
 LOG_FILE = os.path.join(APP_FOLDER, "klaes_sender.log")
+SAMPLE_FILE = os.path.join(APP_FOLDER, "sample_order.json")
 
 logging.basicConfig(
 	filename=LOG_FILE,
@@ -103,11 +105,11 @@ def main():
 
 		if len(sys.argv) > 1:
 			file_path = sys.argv[1]
-			logging.info(f"File: {file_path}")
-			doc_number, content = read_klaes_file(file_path)
 		else:
-			logging.info("No file given: sending a TEST import")
-			doc_number, content = "TEST", ""
+			# No file given: send the test file next to the program
+			file_path = SAMPLE_FILE
+		logging.info(f"File: {file_path}")
+		doc_number, content = read_klaes_file(file_path)
 
 		record_name = create_record(
 			settings,

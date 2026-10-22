@@ -10,6 +10,8 @@ How it works:
             fix the cause, then click "Process again".
 """
 
+import json
+
 import frappe
 from frappe.model.document import Document
 from frappe.utils import today
@@ -47,20 +49,37 @@ def process_import(import_name):
 
 def create_draft_sales_order(klaes_import):
 	"""
-	STEP 1: create an empty Sales Order, saved as DRAFT only (never submitted).
+	STEP 1: create a Sales Order with the items of the Klaes JSON,
+	saved as DRAFT only (never submitted).
+
+	The items must ALREADY EXIST in ERPNext: the Item Code is "SAP_Item_Number"
+	in the JSON. (Creating new items is a later step.)
+
 	Returns the name of the new Sales Order.
 	"""
 	if not klaes_import.customer:
 		frappe.throw("No customer on this Klaes Import.")
+
+	if not klaes_import.json_data:
+		frappe.throw("No JSON data on this Klaes Import.")
+
+	document = json.loads(klaes_import.json_data)["Document"]
 
 	order = frappe.new_doc("Sales Order")
 	order.customer = klaes_import.customer
 	order.transaction_date = today()
 	order.delivery_date = today()
 
-	# The order has no items yet, so we must tell ERPNext to accept
-	# an order with the mandatory "Items" table empty.
-	order.flags.ignore_mandatory = True
+	for klaes_item in document.get("item", []):
+		item_code = klaes_item["SAP_Item_Number"]
+		if not frappe.db.exists("Item", item_code):
+			frappe.throw(f"Item '{item_code}' does not exist in ERPNext.")
+
+		# ERPNext fills in the rest (name, unit, price, warehouse...) when saving
+		order.append("items", {"item_code": item_code, "qty": klaes_item["quantity"]})
+
+	if not order.items:
+		frappe.throw("The Klaes JSON has no items.")
 
 	# insert() only saves the draft. Do NOT call order.submit() here.
 	order.insert()

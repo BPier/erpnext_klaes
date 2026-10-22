@@ -1,0 +1,20 @@
+{
+	"Document": {
+		"project_number": "PRO-TEST-001",
+		"doc_type": "Quotation",
+		"doc_number": "TEST-001",
+		"origin_doc_number": null,
+		"customer_number": "C26-00001",
+		"customer_name": "Test customer",
+		"delivery_date": null,
+		"delivery_location": null,
+		"item": [
+			{
+				"SAP_Item_Number": "Sample Item",
+				"item_number": "1",
+				"short_description": "Sample item for the connection test",
+				"quantity": 1
+			}
+		]
+	}
+}

@@ -25,6 +25,7 @@ erpnext_klaes/                       ← this repository (branch version-16)
 └── klaes_sender/                    ← the Windows program (not installed on the server)
     ├── klaes_sender.py
     ├── config.example.ini
+    ├── sample_order.json            ← test file (one item that exists in ERPNext)
     └── build_exe.bat
 ```
 
@@ -41,7 +42,7 @@ Klaes ──JSON file──> klaes_sender.exe ──HTTPS (standard REST API)─
                      klaes_sender.log                                   │
                                                           background job (process_import)
                                                                         │
-                                                       draft Sales Order + Status Done/Error
+                                                 draft Sales Order with items + Status Done/Error
 ```
 
 1. The exe creates a **Klaes Import** record with Frappe's built-in REST API
@@ -84,10 +85,14 @@ After installing, search for **Klaes Import** in the ERPNext search bar: the lis
 
 ---
 
-### Step 1 — receive the file and create an empty draft Sales Order  ← current step
+### Step 1 — receive the file and create a draft Sales Order with its items  ← current step
 
-In step 1, the Sales Order is created **empty** and saved as **Draft** (never submitted).
-The customer comes from `config.ini` (`test_customer`), not from the JSON yet.
+In step 1, the Sales Order is saved as **Draft** (never submitted), with one line per item of the JSON:
+
+- Item Code = `SAP_Item_Number`, Quantity = `quantity`. ERPNext fills in the rest (name, unit, price, warehouse).
+- The items must **already exist** in ERPNext. Creating new items is step 3, so the real Klaes
+  files (with items like `ALU-NSHWIN-001_Q241023-001A-2`) will fail until then: use `sample_order.json` to test.
+- The customer comes from `config.ini` (`test_customer`), not from the JSON yet.
 
 #### 1. Create an API user in ERPNext
 
@@ -124,6 +129,9 @@ test_customer = C22-0012
 
 To switch from the dev site to production later, only `url`, `api_key` and `api_secret` change.
 
+Then open `sample_order.json` and replace `PUT_EXISTING_ITEM_CODE_HERE` with the **Item Code of an
+item that exists in ERPNext** (Stock → Item). You can change `quantity` too, or add more items.
+
 #### 3. Test from Linux (optional, quickest)
 
 Any machine with Python 3 can run the program directly, without building the exe:
@@ -131,9 +139,9 @@ Any machine with Python 3 can run the program directly, without building the exe
 ```bash
 cd klaes_sender
 cp config.example.ini config.ini      # then edit config.ini
-python3 klaes_sender.py                                      # connection test
-python3 klaes_sender.py ~/Downloads/Q241023-001A_ItemsList.JSON   # real Klaes file
-echo $?                                                      # 0 = OK, 1 = error
+python3 klaes_sender.py                  # sends sample_order.json
+python3 klaes_sender.py my_file.json     # sends another JSON file
+echo $?                                  # 0 = OK, 1 = error
 ```
 
 #### 4. Build the exe and install it on Windows Server 2019
@@ -142,25 +150,23 @@ On any Windows machine with Python installed:
 
 1. Copy the `klaes_sender` folder.
 2. Double-click `build_exe.bat`.
-3. The `dist` folder now contains `klaes_sender.exe` and `config.example.ini`.
+3. The `dist` folder now contains `klaes_sender.exe`, `config.example.ini` and `sample_order.json`.
 
 On the Windows server:
 
-1. Copy `klaes_sender.exe` and `config.example.ini` to a folder, e.g. `C:\KlaesSender\`.
-2. Create `config.ini` from `config.example.ini`, as explained in step 2.
-3. **Connection test** (no file): open a command prompt and run
+1. Copy `klaes_sender.exe`, `config.example.ini` and `sample_order.json` to a folder, e.g. `C:\KlaesSender\`.
+2. Create `config.ini` and edit `sample_order.json`, as explained in step 2.
+3. **Test** (no file given, so it sends `sample_order.json`): open a command prompt and run
    ```
    C:\KlaesSender\klaes_sender.exe
    ```
-   Expected: `Klaes Import created: KLAES-00001 (TEST)`
-4. **Test with a real Klaes file:**
+   Expected: `Klaes Import created: KLAES-00002 (TEST-001)`
+4. In ERPNext, open **Klaes Import**: the record should have status **Done** after a few seconds,
+   with a link to a new **Draft** Sales Order containing the sample item.
+5. Later (from step 3), Klaes will run the program after each export, with the JSON file path as argument:
    ```
    C:\KlaesSender\klaes_sender.exe "C:\path\to\Q241023-001A_ItemsList.JSON"
    ```
-   Expected: `Klaes Import created: KLAES-00002 (Q241023-001A)`
-5. In ERPNext, open **Klaes Import**: the records should have status **Done** after a few seconds,
-   with a link to a new **Draft** Sales Order (no items).
-6. In Klaes, set the program to run after the export, with the JSON file path as argument.
 
 #### If something fails
 
@@ -178,6 +184,8 @@ On the ERPNext side, open the Klaes Import record:
 | What you see | Meaning |
 |---|---|
 | Status **Error**, e.g. `Customer ... not found` | Fix the cause, then click **Process again** |
+| `Item '...' does not exist in ERPNext` | Put an existing Item Code in the JSON (step 1 does not create items) |
+| `Delivery warehouse required for stock item ...` | Set a default warehouse on the item, or in Stock Settings |
 | Status stays **Pending** | Background workers are not running on the server (`bench doctor` to check) |
 
 ---
@@ -185,10 +193,9 @@ On the ERPNext side, open the Klaes Import record:
 ### Next steps (one at a time, each tested before the next)
 
 2. Read `customer_number` from the JSON instead of `config.ini`, and put `doc_number` on the order.
-3. Create the items (`SAP_Item_Number`, descriptions, item group).
-4. Add the items to the order.
-5. Create the BOM of each item from `bill_of_material`.
-6. Daily XML file of validated orders, emailed to the production manager.
+3. Create the items that do not exist yet (`SAP_Item_Number`, descriptions, item group).
+4. Create the BOM of each item from `bill_of_material`.
+5. Daily XML file of validated orders, emailed to the production manager.
 
 ---
 
