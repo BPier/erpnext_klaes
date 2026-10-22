@@ -219,6 +219,25 @@ On the ERPNext side, open the Klaes Import record:
 
 ---
 
+### Tests
+
+The tests are in `erpnext_klaes/erpnext_klaes/doctype/klaes_import/test_klaes_import.py`:
+
+```bash
+bench --site dev.localhost set-config allow_tests true   # first time only
+bench --site dev.localhost run-tests --app erpnext_klaes
+```
+
+- Everything the tests create (customer, items, quotations, orders) is **rolled back** at the end.
+- Run `migrate` before the tests: they need the **Klaes Doc Number** field.
+- **Real Klaes files** are in the `test_data/` folder next to the tests, and are imported exactly as Klaes
+  sends them: `Q241023-001A_ItemsList.JSON` (a real Klaes quotation, 49 items) and
+  `O241023-001_ItemsList.JSON` (an order in the same layout, 2 items).
+  To test a new Klaes file (for example one that caused a problem), put it in `test_data/`
+  and copy one of the `test_real_klaes_..._file` tests.
+
+---
+
 ### Next steps (one at a time, each tested before the next)
 
 3. Create the items that do not exist yet (`SAP_Item_Number`, descriptions, item group).

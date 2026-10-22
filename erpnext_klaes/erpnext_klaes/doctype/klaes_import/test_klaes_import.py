@@ -6,6 +6,8 @@ Tests for Klaes Import:
 - step 1: draft document with existing items
 - step 2: Klaes "Quotation" -> draft Quotation, Klaes "Order" -> draft Sales Order,
           with the Klaes document number on the created document.
+- real Klaes files: the JSON files in the test_data/ folder are imported as Klaes sends them.
+  To test a new file: put it in test_data/ and copy one of the "real Klaes files" tests.
 
 Run them with:
     bench --site <site> run-tests --doctype "Klaes Import" --skip-before-tests
@@ -14,6 +16,7 @@ Everything created by these tests is rolled back at the end (IntegrationTestCase
 """
 
 import json
+import os
 
 import frappe
 from frappe.tests import IntegrationTestCase
@@ -28,6 +31,35 @@ IGNORE_TEST_RECORD_DEPENDENCIES = ["Customer", "Quotation", "Sales Order"]
 UNKNOWN_ITEM = "_Test Item That Does Not Exist"
 ORDER_NUMBER = "O-TEST-UNIT-001"
 QUOTATION_NUMBER = "Q-TEST-UNIT-001"
+
+# Real Klaes JSON files used by the tests
+TEST_DATA_FOLDER = os.path.join(os.path.dirname(__file__), "test_data")
+
+
+def read_test_file(file_name):
+	"""Return the text of a JSON file of the test_data/ folder, read like klaes_sender does."""
+	with open(os.path.join(TEST_DATA_FOLDER, file_name), "rb") as f:
+		return f.read().decode("utf-8-sig")
+
+
+def create_missing_items(klaes_items):
+	"""
+	Create the items of a Klaes file that do not exist yet (Item Code = SAP_Item_Number).
+	Needed until the import creates the items itself (step 3).
+	"""
+	for klaes_item in klaes_items:
+		item_code = klaes_item["SAP_Item_Number"]
+		if not frappe.db.exists("Item", item_code):
+			frappe.get_doc(
+				{
+					"doctype": "Item",
+					"item_code": item_code,
+					"item_name": klaes_item["short_description"],
+					"item_group": "All Item Groups",
+					"stock_uom": "Nos",
+					"is_stock_item": 0,
+				}
+			).insert()
 
 
 def get_or_create(doctype, name_field, values):
@@ -177,6 +209,47 @@ class IntegrationTestKlaesImport(IntegrationTestCase):
 		self.assertEqual(klaes_import.status, "Error")
 		self.assertIn("does not match", klaes_import.error_message)
 		self.assertFalse(klaes_import.sales_order)
+
+	# ---- real Klaes files (test_data/ folder) --------------------------------------
+
+	def check_lines(self, erpnext_document, klaes_items):
+		"""Check one line per Klaes item, in the same order, with the same item and quantity."""
+		self.assertEqual(len(erpnext_document.items), len(klaes_items))
+		for line, klaes_item in zip(erpnext_document.items, klaes_items, strict=True):
+			self.assertEqual(line.item_code, klaes_item["SAP_Item_Number"])
+			self.assertEqual(line.qty, klaes_item["quantity"])
+
+	def test_real_klaes_quotation_file(self):
+		klaes_json = read_test_file("Q241023-001A_ItemsList.JSON")
+		klaes_items = json.loads(klaes_json)["Document"]["item"]
+		create_missing_items(klaes_items)
+
+		klaes_import = self.process(self.make_klaes_import(klaes_json))
+
+		self.assertEqual(klaes_import.status, "Done", klaes_import.error_message)
+		self.assertEqual(klaes_import.doc_type, "Quotation")
+		self.assertEqual(klaes_import.doc_number, "Q241023-001A")
+
+		quotation = frappe.get_doc("Quotation", klaes_import.quotation)
+		self.assertEqual(quotation.docstatus, 0)  # Draft
+		self.assertEqual(quotation.klaes_doc_number, "Q241023-001A")
+		self.check_lines(quotation, klaes_items)  # 49 items in this file
+
+	def test_real_klaes_order_file(self):
+		klaes_json = read_test_file("O241023-001B_ItemsList.JSON")
+		klaes_items = json.loads(klaes_json)["Document"]["item"]
+		create_missing_items(klaes_items)
+
+		klaes_import = self.process(self.make_klaes_import(klaes_json))
+
+		self.assertEqual(klaes_import.status, "Done", klaes_import.error_message)
+		self.assertEqual(klaes_import.doc_type, "Order")
+		self.assertEqual(klaes_import.doc_number, "O241023-001B")
+
+		order = frappe.get_doc("Sales Order", klaes_import.sales_order)
+		self.assertEqual(order.docstatus, 0)  # Draft
+		self.assertEqual(order.klaes_doc_number, "O241023-001B")
+		self.check_lines(order, klaes_items)  # 2 items, quantities 2 and 3
 
 	# ---- step 1: items and errors ------------------------------------------------
 

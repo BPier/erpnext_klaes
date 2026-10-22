@@ -1,8 +1,8 @@
 {
 	"Document": {
 		"project_number": "PRO-TEST-001",
-		"doc_type": "Quotation",
-		"doc_number": "Q-TEST-001",
+		"doc_type": "Order",
+		"doc_number": "O261022-0012",
 		"origin_doc_number": null,
 		"customer_number": "C26-00001",
 		"customer_name": "Test customer",
