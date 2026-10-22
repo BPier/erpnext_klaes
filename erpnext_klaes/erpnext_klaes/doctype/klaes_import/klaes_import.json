@@ -6,9 +6,11 @@
  "engine": "InnoDB",
  "field_order": [
   "doc_number",
+  "doc_type",
   "customer",
   "column_break_1",
   "status",
+  "quotation",
   "sales_order",
   "section_error",
   "error_message",
@@ -22,6 +24,13 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Klaes Document Number"
+  },
+  {
+   "fieldname": "doc_type",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Klaes Document Type",
+   "read_only": 1
   },
   {
    "fieldname": "customer",
@@ -43,6 +52,14 @@
    "in_standard_filter": 1,
    "label": "Status",
    "options": "Pending\nDone\nError",
+   "read_only": 1
+  },
+  {
+   "fieldname": "quotation",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Quotation",
+   "options": "Quotation",
    "read_only": 1
   },
   {
@@ -80,7 +97,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-10-22 14:00:00.000000",
+ "modified": "2026-10-22 16:10:00.000000",
  "modified_by": "Administrator",
  "module": "Erpnext Klaes",
  "name": "Klaes Import",

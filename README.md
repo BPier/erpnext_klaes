@@ -18,6 +18,7 @@ erpnext_klaes/                       ← this repository (branch version-16)
 ├── erpnext_klaes/                   ← the Frappe app (installed on the server)
 │   ├── hooks.py
 │   ├── modules.txt
+│   ├── fixtures/custom_field.json   ← "Klaes Doc Number" field on Quotation and Sales Order
 │   └── erpnext_klaes/doctype/klaes_import/
 │       ├── klaes_import.json        ← fields of the Klaes Import DocType
 │       ├── klaes_import.py          ← ALL the processing logic
@@ -42,14 +43,14 @@ Klaes ──JSON file──> klaes_sender.exe ──HTTPS (standard REST API)─
                      klaes_sender.log                                   │
                                                           background job (process_import)
                                                                         │
-                                                 draft Sales Order with items + Status Done/Error
+                                    draft Quotation or Sales Order with items + Status Done/Error
 ```
 
 1. The exe creates a **Klaes Import** record with Frappe's built-in REST API
    (`POST /api/resource/Klaes Import`). No custom endpoint is needed.
 2. Once the record is saved, ERPNext processes it in the background.
 3. The result is visible in ERPNext, in the **Klaes Import** list:
-   - **Done**: the Sales Order field links to the created order.
+   - **Done**: the Quotation or Sales Order field links to the created document.
    - **Error**: the Error Message field explains why. Fix the cause, then click **Process again**.
      Technical details are also in ERPNext's standard **Error Log**.
 4. The JSON received from Klaes is kept on each record, so it can always be checked or reprocessed.
@@ -85,19 +86,44 @@ After installing, search for **Klaes Import** in the ERPNext search bar: the lis
 
 ---
 
-### Step 1 — receive the file and create a draft Sales Order with its items  ← current step
+### Steps 1 and 2 — create a draft Quotation or Sales Order with its items  ← current step
 
-In step 1, the Sales Order is saved as **Draft** (never submitted), with one line per item of the JSON:
+`doc_type` and `doc_number` in the JSON decide which document is created. They must agree:
 
-- Item Code = `SAP_Item_Number`, Quantity = `quantity`. ERPNext fills in the rest (name, unit, price, warehouse).
+| `doc_type` in the JSON | `doc_number` must start with | ERPNext creates |
+|---|---|---|
+| `Quotation` | `Q` (e.g. `Q241023-001A`) | a draft **Quotation** |
+| `Order` | `O` (e.g. `O260909-0201`) | a draft **Sales Order** |
+
+Anything else (another `doc_type`, or a number that does not match) gives an **Error**, and nothing is created.
+
+- The document is saved as **Draft** (never submitted). A Sales Order is then made from the Quotation
+  in ERPNext, with the standard **Create → Sales Order** button.
+- The Klaes number is saved in the **Klaes Doc Number** field (`klaes_doc_number`) of the Quotation or Sales Order
+  (you can filter lists on it). It is carried over when a Sales Order is made from the Quotation.
+- One line per item of the JSON: Item Code = `SAP_Item_Number`, Quantity = `quantity`.
+  ERPNext fills in the rest (name, unit, price, warehouse).
 - The items must **already exist** in ERPNext. Creating new items is step 3, so the real Klaes
   files (with items like `ALU-NSHWIN-001_Q241023-001A-2`) will fail until then: use `sample_order.json` to test.
 - The customer comes from `config.ini` (`test_customer`), not from the JSON yet.
 
+After updating the app, run `bench --site <site> migrate`: it adds the new fields to Klaes Import
+and creates the **Klaes Doc Number** field on Quotation and Sales Order.
+
+This field is a standard Frappe **fixture**: it is stored in `erpnext_klaes/fixtures/custom_field.json`
+(declared by `fixtures` in `hooks.py`) and imported by every `install-app` and `migrate`. To change it:
+
+1. On the dev site, change the field in **Customize Form** (Quotation or Sales Order).
+   Keep its **Module** set to `Erpnext Klaes`.
+2. Export it back to the app, then commit the JSON file:
+   ```bash
+   bench --site erpnext-dev.saintlu.lc export-fixtures --app erpnext_klaes
+   ```
+
 #### 1. Create an API user in ERPNext
 
 1. Create a user, e.g. `klaes@saintlu.lc`, with the role **Sales User**
-   (this role can create Klaes Import records and Sales Orders).
+   (this role can create Klaes Import records, Quotations and Sales Orders).
 2. Open the user → **Settings** → **API Access** → **Generate Keys**.
 3. Copy the **API Key** and **API Secret** (the secret is shown only once).
 
@@ -160,9 +186,10 @@ On the Windows server:
    ```
    C:\KlaesSender\klaes_sender.exe
    ```
-   Expected: `Klaes Import created: KLAES-00002 (TEST-001)`
+   Expected: `Klaes Import created: KLAES-00002 (Q-TEST-001)`
 4. In ERPNext, open **Klaes Import**: the record should have status **Done** after a few seconds,
-   with a link to a new **Draft** Sales Order containing the sample item.
+   with a link to a new **Draft** Quotation containing the sample item, and **Klaes Doc Number** `Q-TEST-001`.
+   To test a Sales Order, change `sample_order.json` to `"doc_type": "Order"` and a number starting with `O`.
 5. Later (from step 3), Klaes will run the program after each export, with the JSON file path as argument:
    ```
    C:\KlaesSender\klaes_sender.exe "C:\path\to\Q241023-001A_ItemsList.JSON"
@@ -184,6 +211,8 @@ On the ERPNext side, open the Klaes Import record:
 | What you see | Meaning |
 |---|---|
 | Status **Error**, e.g. `Customer ... not found` | Fix the cause, then click **Process again** |
+| `Unknown Klaes document type '...'` | `doc_type` in the JSON must be `Quotation` or `Order` |
+| `Klaes document type '...' does not match document number '...'` | A Quotation number must start with `Q`, an Order number with `O` |
 | `Item '...' does not exist in ERPNext` | Put an existing Item Code in the JSON (step 1 does not create items) |
 | `Delivery warehouse required for stock item ...` | Set a default warehouse on the item, or in Stock Settings |
 | Status stays **Pending** | Background workers are not running on the server (`bench doctor` to check) |
@@ -192,10 +221,10 @@ On the ERPNext side, open the Klaes Import record:
 
 ### Next steps (one at a time, each tested before the next)
 
-2. Read `customer_number` from the JSON instead of `config.ini`, and put `doc_number` on the order.
 3. Create the items that do not exist yet (`SAP_Item_Number`, descriptions, item group).
-4. Create the BOM of each item from `bill_of_material`.
-5. Daily XML file of validated orders, emailed to the production manager.
+4. Read `customer_number` from the JSON instead of `config.ini`.
+5. Create the BOM of each item from `bill_of_material`.
+6. Daily XML file of validated orders, emailed to the production manager.
 
 ---
 
