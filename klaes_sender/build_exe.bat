@@ -8,9 +8,9 @@ pip install pyinstaller
 pyinstaller --onefile --console klaes_sender.py
 
 copy /Y config.example.ini dist\config.example.ini
-copy /Y sample_order.json dist\sample_order.json
+xcopy /Y /I Samples dist\Samples
 
 echo.
-echo Done. The "dist" folder contains klaes_sender.exe, config.example.ini and sample_order.json
+echo Done. The "dist" folder contains klaes_sender.exe, config.example.ini and the Samples folder
 echo Next: copy config.example.ini to config.ini and fill in your settings.
 pause

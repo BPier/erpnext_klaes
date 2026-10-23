@@ -12,6 +12,11 @@ How it works:
 Which document is created depends on "doc_type" in the Klaes JSON:
    - "Quotation" -> draft Quotation   (doc_number must start with "Q", e.g. Q241023-001A)
    - "Order"     -> draft Sales Order (doc_number must start with "O", e.g. O260909-0201)
+
+The items of the JSON are created first, as variants of their template (see klaes_items.py).
+
+The customer is always the generic "klaes import" customer (C99-9999, see install.py):
+the sales team sets the real customer on the draft document in ERPNext.
 """
 
 import json
@@ -19,6 +24,9 @@ import json
 import frappe
 from frappe.model.document import Document
 from frappe.utils import today
+
+from erpnext_klaes.erpnext_klaes.doctype.klaes_import.klaes_items import create_or_update_items
+from erpnext_klaes.install import create_generic_customer
 
 # Klaes "doc_type" -> first letter that its "doc_number" must start with
 DOC_NUMBER_PREFIX = {
@@ -50,16 +58,21 @@ def process_import(import_name):
 		document = read_klaes_document(klaes_import)
 		doc_type, doc_number = check_doc_type_and_number(document)
 
+		# Step 3: create (or update) the items, as variants of their template
+		create_or_update_items(document)
+
+		customer = get_customer()
 		if doc_type == "Quotation":
-			result = {"quotation": create_draft_quotation(klaes_import.customer, document)}
+			result = {"quotation": create_draft_quotation(customer, document)}
 		else:
-			result = {"sales_order": create_draft_sales_order(klaes_import.customer, document)}
+			result = {"sales_order": create_draft_sales_order(customer, document)}
 
 		klaes_import.db_set(
 			{
 				"status": "Done",
 				"doc_type": doc_type,
 				"doc_number": doc_number,
+				"customer": customer,
 				"error_message": "",
 				**result,
 			}
@@ -72,11 +85,16 @@ def process_import(import_name):
 		frappe.log_error(title=f"Klaes Import {import_name} failed")
 
 
+def get_customer():
+	"""Return the generic Klaes customer (created if it does not exist)."""
+	customer = create_generic_customer()
+	if not customer:
+		frappe.throw("Complete the ERPNext setup wizard first: the Klaes customer cannot be created.")
+	return customer
+
+
 def read_klaes_document(klaes_import):
 	"""Check the Klaes Import and return the "Document" part of its JSON."""
-	if not klaes_import.customer:
-		frappe.throw("No customer on this Klaes Import.")
-
 	if not klaes_import.json_data:
 		frappe.throw("No JSON data on this Klaes Import.")
 
@@ -137,8 +155,8 @@ def add_items(erpnext_document, document):
 	"""
 	Add one line per item of the Klaes JSON to a Quotation or Sales Order.
 
-	The items must ALREADY EXIST in ERPNext: the Item Code is "SAP_Item_Number"
-	in the JSON. (Creating new items is a later step.)
+	The Item Code is "SAP_Item_Number" in the JSON.
+	The items are created before, by create_or_update_items().
 	"""
 	for klaes_item in document.get("item", []):
 		item_code = klaes_item["SAP_Item_Number"]

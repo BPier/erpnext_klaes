@@ -1,0 +1,25 @@
+{
+	"Document": {
+		"project_number": "PRO-TEST-001",
+		"doc_type": "Order",
+		"doc_number": "O261022-0012",
+		"origin_doc_number": null,
+		"delivery_date": null,
+		"delivery_location": null,
+		"item": [
+			{
+				"SAP_Item_Number": "SAMPLE-WIN-001_O261022-0012-1",
+				"item_number": "1",
+				"template": "SAMPLE-WIN-001",
+				"item_group_name": "FG - NSH",
+				"short_description": "Sample window for the connection test",
+				"long_description": "Sample window for the connection test||H:48'' x W:36'' (H:1219 mm x W:914 mm)||White Powder Coat||",
+				"height": 1219.2,
+				"width": 914.4,
+				"color": "White Powder Coat",
+				"OPTION_YN_colonial": true,
+				"quantity": 1
+			}
+		]
+	}
+}

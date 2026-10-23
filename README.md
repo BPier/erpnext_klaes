@@ -17,16 +17,19 @@ erpnext_klaes/                       ← this repository (branch version-16)
 ├── .gitignore
 ├── erpnext_klaes/                   ← the Frappe app (installed on the server)
 │   ├── hooks.py
+│   ├── install.py                   ← creates the generic customer "klaes import" (C99-9999)
 │   ├── modules.txt
 │   ├── fixtures/custom_field.json   ← "Klaes Doc Number" field on Quotation and Sales Order
 │   └── erpnext_klaes/doctype/klaes_import/
 │       ├── klaes_import.json        ← fields of the Klaes Import DocType
-│       ├── klaes_import.py          ← ALL the processing logic
+│       ├── klaes_import.py          ← the processing: Quotation or Sales Order
+│       ├── klaes_items.py           ← the items: variants of their template
 │       └── klaes_import.js          ← "Process again" button
 └── klaes_sender/                    ← the Windows program (not installed on the server)
     ├── klaes_sender.py
     ├── config.example.ini
-    ├── sample_order.json            ← test file (one item that exists in ERPNext)
+    ├── Samples/                     ← Klaes JSON files to test by hand
+    │   └── sample_order.json        ← sent when no file is given (one sample window)
     └── build_exe.bat
 ```
 
@@ -86,7 +89,7 @@ After installing, search for **Klaes Import** in the ERPNext search bar: the lis
 
 ---
 
-### Steps 1 and 2 — create a draft Quotation or Sales Order with its items  ← current step
+### Steps 1 to 3 — create the items and a draft Quotation or Sales Order  ← current step
 
 `doc_type` and `doc_number` in the JSON decide which document is created. They must agree:
 
@@ -103,9 +106,42 @@ Anything else (another `doc_type`, or a number that does not match) gives an **E
   (you can filter lists on it). It is carried over when a Sales Order is made from the Quotation.
 - One line per item of the JSON: Item Code = `SAP_Item_Number`, Quantity = `quantity`.
   ERPNext fills in the rest (name, unit, price, warehouse).
-- The items must **already exist** in ERPNext. Creating new items is step 3, so the real Klaes
-  files (with items like `ALU-NSHWIN-001_Q241023-001A-2`) will fail until then: use `sample_order.json` to test.
-- The customer comes from `config.ini` (`test_customer`), not from the JSON yet.
+- The items are created first (step 3), see below.
+- The customer is always the generic customer **`klaes import`** (ID **`C99-9999`**): the sales team
+  sets the real customer on the draft document in ERPNext. This customer is created automatically
+  when the app is installed and on each `migrate` (see `install.py`), and again by the import if it was deleted.
+
+#### Items: variants of their template (step 3)
+
+Each item of the JSON becomes a **variant** of its `template` (e.g. `ALU-NSHWIN-001`):
+
+- Item Code = `SAP_Item_Number`, Item Name = `short_description`,
+  Description = `long_description` (one line per `||` part).
+- The variant copies the rest from its template (item group, unit...), as usual in ERPNext.
+- It has 5 attributes:
+
+| JSON field | ERPNext attribute (Stock → Item Attribute) | Type |
+|---|---|---|
+| `SAP_Item_Number` | Klaes SAP Item Number | list: each new SAP number is added |
+| `height` | Klaes Height | number, 0 to 100000 (mm), 2 decimals |
+| `width` | Klaes Width | number, 0 to 100000 (mm), 2 decimals |
+| `color` | Klaes Color | list: each new color is added |
+| `OPTION_YN_colonial` | Klaes Colonial | list: `Yes` (true) / `No` (false or null) |
+
+Created automatically when missing:
+- the 5 **Item Attributes**;
+- the **template**: "Has Variants" ticked, with the 5 attributes, unit `Nos`, item group = `item_group_name`
+  of the JSON if that group exists in ERPNext, otherwise `All Item Groups`.
+
+If the item **already exists** (same `SAP_Item_Number`, e.g. Klaes sends it again), its attributes and
+description are **updated** from the new JSON. It must be a variant of the same template, otherwise: Error.
+
+If a template exists but is not set up (Has Variants not ticked, or attributes missing): Error.
+Fix it in ERPNext, then click **Process again**. The attribute names are at the top of `klaes_items.py`.
+
+ERPNext must name items by their code: **Stock Settings → Item Naming By = Item Code**.
+
+#### Migrate
 
 After updating the app, run `bench --site <site> migrate`: it adds the new fields to Klaes Import
 and creates the **Klaes Doc Number** field on Quotation and Sales Order.
@@ -122,8 +158,8 @@ This field is a standard Frappe **fixture**: it is stored in `erpnext_klaes/fixt
 
 #### 1. Create an API user in ERPNext
 
-1. Create a user, e.g. `klaes@saintlu.lc`, with the role **Sales User**
-   (this role can create Klaes Import records, Quotations and Sales Orders).
+1. Create a user, e.g. `klaes@saintlu.lc`, with the roles **Sales User**
+   (Klaes Import records, Quotations and Sales Orders) and **Item Manager** (items, templates, attributes).
 2. Open the user → **Settings** → **API Access** → **Generate Keys**.
 3. Copy the **API Key** and **API Secret** (the secret is shown only once).
 
@@ -143,7 +179,6 @@ The repository only contains an example, `config.example.ini`:
 url = https://erpnext-dev.saintlu.lc
 api_key = 1a2b3c4d5e6f7g8
 api_secret = 9h8g7f6e5d4c3b2
-test_customer = C22-0012
 ```
 
 | Setting | What to put |
@@ -151,12 +186,13 @@ test_customer = C22-0012
 | `url` | Address of the ERPNext site (dev or production) |
 | `api_key` | API Key of the Klaes user (step 1) |
 | `api_secret` | API Secret of the Klaes user (step 1) |
-| `test_customer` | **Step 1 only:** the ID of a Customer that exists in ERPNext |
+
+An old `config.ini` with a `test_customer` line still works: that line is ignored now.
 
 To switch from the dev site to production later, only `url`, `api_key` and `api_secret` change.
 
-Then open `sample_order.json` and replace `PUT_EXISTING_ITEM_CODE_HERE` with the **Item Code of an
-item that exists in ERPNext** (Stock → Item). You can change `quantity` too, or add more items.
+The `Samples` folder holds Klaes JSON files to test by hand. `Samples/sample_order.json` is sent when
+no file is given: one sample window, whose template `SAMPLE-WIN-001` is created automatically.
 
 #### 3. Test from Linux (optional, quickest)
 
@@ -165,7 +201,7 @@ Any machine with Python 3 can run the program directly, without building the exe
 ```bash
 cd klaes_sender
 cp config.example.ini config.ini      # then edit config.ini
-python3 klaes_sender.py                  # sends sample_order.json
+python3 klaes_sender.py                  # sends Samples/sample_order.json
 python3 klaes_sender.py my_file.json     # sends another JSON file
 echo $?                                  # 0 = OK, 1 = error
 ```
@@ -176,21 +212,22 @@ On any Windows machine with Python installed:
 
 1. Copy the `klaes_sender` folder.
 2. Double-click `build_exe.bat`.
-3. The `dist` folder now contains `klaes_sender.exe`, `config.example.ini` and `sample_order.json`.
+3. The `dist` folder now contains `klaes_sender.exe`, `config.example.ini` and the `Samples` folder.
 
 On the Windows server:
 
-1. Copy `klaes_sender.exe`, `config.example.ini` and `sample_order.json` to a folder, e.g. `C:\KlaesSender\`.
-2. Create `config.ini` and edit `sample_order.json`, as explained in step 2.
-3. **Test** (no file given, so it sends `sample_order.json`): open a command prompt and run
+1. Copy `klaes_sender.exe`, `config.example.ini` and the `Samples` folder to a folder, e.g. `C:\KlaesSender\`.
+2. Create `config.ini`, as explained in step 2.
+3. **Test** (no file given, so it sends `Samples\sample_order.json`): open a command prompt and run
    ```
    C:\KlaesSender\klaes_sender.exe
    ```
-   Expected: `Klaes Import created: KLAES-00002 (Q-TEST-001)`
+   Expected: `Klaes Import created: KLAES-00002 (O261022-0012)`
 4. In ERPNext, open **Klaes Import**: the record should have status **Done** after a few seconds,
-   with a link to a new **Draft** Quotation containing the sample item, and **Klaes Doc Number** `Q-TEST-001`.
-   To test a Sales Order, change `sample_order.json` to `"doc_type": "Order"` and a number starting with `O`.
-5. Later (from step 3), Klaes will run the program after each export, with the JSON file path as argument:
+   with a link to a new **Draft** Sales Order, **Klaes Doc Number** `O261022-0012`, and one line:
+   the new item `SAMPLE-WIN-001_O261022-0012-1`, a variant of the new template `SAMPLE-WIN-001`.
+   To test a Quotation, change `Samples\sample_order.json` to `"doc_type": "Quotation"` and a number starting with `Q`.
+5. Klaes runs the program after each export, with the JSON file path as argument:
    ```
    C:\KlaesSender\klaes_sender.exe "C:\path\to\Q241023-001A_ItemsList.JSON"
    ```
@@ -202,7 +239,7 @@ On the sender side, read `klaes_sender.log` (same folder as the program):
 | Message in the log | Meaning |
 |---|---|
 | `Config file not found` | Create `config.ini` from `config.example.ini` (step 2) |
-| `HTTP 401` / `HTTP 403` | API key/secret wrong, or user lacks the Sales User role |
+| `HTTP 401` / `HTTP 403` | API key/secret wrong, or user lacks the Sales User / Item Manager role |
 | `HTTP 404` | App not installed on the site, or `migrate` / `bench restart` not done |
 | `URLError` / timeout | This machine cannot reach the ERPNext URL (firewall/proxy) |
 
@@ -210,10 +247,16 @@ On the ERPNext side, open the Klaes Import record:
 
 | What you see | Meaning |
 |---|---|
-| Status **Error**, e.g. `Customer ... not found` | Fix the cause, then click **Process again** |
+| Status **Error** | Fix the cause shown in the Error Message, then click **Process again** |
+| `Complete the ERPNext setup wizard first` | The generic customer can only be created once ERPNext is set up |
 | `Unknown Klaes document type '...'` | `doc_type` in the JSON must be `Quotation` or `Order` |
 | `Klaes document type '...' does not match document number '...'` | A Quotation number must start with `Q`, an Order number with `O` |
-| `Item '...' does not exist in ERPNext` | Put an existing Item Code in the JSON (step 1 does not create items) |
+| `Item '...' has no template in the Klaes JSON` | The item has no `template` in the Klaes export |
+| `Item '...' exists but is not a template` | Tick **Has Variants** on that item (it must have no transactions yet) |
+| `Template '...' is missing these attributes: ...` | Add the listed Klaes attributes to the template's Attributes table |
+| `Item '...' already exists but is not a variant of template '...'` | An item with this code was created by hand, or with another template |
+| `Template '...' was created as '...'` | Stock Settings: set **Item Naming By** to **Item Code** |
+| `No permission` on Item or Item Attribute | Give the Klaes API user the **Item Manager** role |
 | `Delivery warehouse required for stock item ...` | Set a default warehouse on the item, or in Stock Settings |
 | Status stays **Pending** | Background workers are not running on the server (`bench doctor` to check) |
 
@@ -230,9 +273,12 @@ bench --site dev.localhost run-tests --app erpnext_klaes
 
 - Everything the tests create (customer, items, quotations, orders) is **rolled back** at the end.
 - Run `migrate` before the tests: they need the **Klaes Doc Number** field.
+- The created items are stock items: the site needs a **default warehouse** in Stock Settings
+  for the Sales Order tests.
 - **Real Klaes files** are in the `test_data/` folder next to the tests, and are imported exactly as Klaes
   sends them: `Q241023-001A_ItemsList.JSON` (a real Klaes quotation, 49 items) and
-  `O241023-001_ItemsList.JSON` (an order in the same layout, 2 items).
+  `O241023-001B_ItemsList.JSON` (an order in the same layout, 2 items). The tests check that every
+  item is created as a variant of its template, with the right attributes.
   To test a new Klaes file (for example one that caused a problem), put it in `test_data/`
   and copy one of the `test_real_klaes_..._file` tests.
 
@@ -240,10 +286,8 @@ bench --site dev.localhost run-tests --app erpnext_klaes
 
 ### Next steps (one at a time, each tested before the next)
 
-3. Create the items that do not exist yet (`SAP_Item_Number`, descriptions, item group).
-4. Read `customer_number` from the JSON instead of `config.ini`.
-5. Create the BOM of each item from `bill_of_material`.
-6. Daily XML file of validated orders, emailed to the production manager.
+4. Create the BOM of each item from `bill_of_material`.
+5. Daily XML file of validated orders, emailed to the production manager.
 
 ---
 

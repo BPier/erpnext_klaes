@@ -97,7 +97,10 @@ required_apps = ["erpnext"]
 # ------------
 
 # before_install = "erpnext_klaes.install.before_install"
-# after_install = "erpnext_klaes.install.after_install"
+
+# Create the generic "klaes import" customer (see install.py)
+after_install = "erpnext_klaes.install.after_install"
+after_migrate = "erpnext_klaes.install.after_migrate"
 
 # Fixtures
 # --------
