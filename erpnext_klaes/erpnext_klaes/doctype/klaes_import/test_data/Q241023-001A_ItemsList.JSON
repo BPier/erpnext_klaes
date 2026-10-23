@@ -10,7 +10,7 @@
 		"delivery_location":null,
 		"item": [
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-2",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-2",
 				"item_number": "2",
 				"architect_number": "2",
 				"template":"ALU-NSHWIN-001",
@@ -117,7 +117,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-3",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-3",
 				"item_number": "3",
 				"architect_number": "3",
 				"template":"ALU-NSHWIN-001",
@@ -224,7 +224,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-4",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-4",
 				"item_number": "4",
 				"architect_number": "4",
 				"template":"ALU-NSHWIN-001",
@@ -331,7 +331,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-5",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-5",
 				"item_number": "5",
 				"architect_number": "5",
 				"template":"ALU-NSHWIN-001",
@@ -438,7 +438,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-6",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-6",
 				"item_number": "6",
 				"architect_number": "6",
 				"template":"ALU-NSHWIN-001",
@@ -545,7 +545,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-7",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-7",
 				"item_number": "7",
 				"architect_number": "7",
 				"template":"ALU-NSHWIN-001",
@@ -652,7 +652,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-8",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-8",
 				"item_number": "8",
 				"architect_number": "8",
 				"template":"ALU-NSHWIN-001",
@@ -759,7 +759,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-9",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-9",
 				"item_number": "9",
 				"architect_number": "9",
 				"template":"ALU-NSHWIN-001",
@@ -866,7 +866,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-10",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-10",
 				"item_number": "10",
 				"architect_number": "10",
 				"template":"ALU-NSHWIN-001",
@@ -973,7 +973,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-11",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-11",
 				"item_number": "11",
 				"architect_number": "11",
 				"template":"ALU-NSHWIN-001",
@@ -1080,7 +1080,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-12",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-12",
 				"item_number": "12",
 				"architect_number": "12",
 				"template":"ALU-NSHWIN-001",
@@ -1187,7 +1187,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-13",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-13",
 				"item_number": "13",
 				"architect_number": "13",
 				"template":"ALU-NSHWIN-001",
@@ -1294,7 +1294,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-14",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-14",
 				"item_number": "14",
 				"architect_number": "14",
 				"template":"ALU-NSHWIN-001",
@@ -1401,7 +1401,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-15",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-15",
 				"item_number": "15",
 				"architect_number": "15",
 				"template":"ALU-NSHWIN-001",
@@ -1508,7 +1508,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-16",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-16",
 				"item_number": "16",
 				"architect_number": "16",
 				"template":"ALU-NSHWIN-001",
@@ -1615,7 +1615,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-17",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-17",
 				"item_number": "17",
 				"architect_number": "17",
 				"template":"ALU-NSHWIN-001",
@@ -1722,7 +1722,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-18",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-18",
 				"item_number": "18",
 				"architect_number": "18",
 				"template":"ALU-NSHWIN-001",
@@ -1829,7 +1829,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-19",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-19",
 				"item_number": "19",
 				"architect_number": "Reference",
 				"template":"ALU-NSHWIN-001",
@@ -1936,7 +1936,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-20",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-20",
 				"item_number": "20",
 				"architect_number": "20",
 				"template":"ALU-NSHWIN-001",
@@ -2043,7 +2043,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-21",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-21",
 				"item_number": "21",
 				"architect_number": "21",
 				"template":"ALU-NSHWIN-001",
@@ -2150,7 +2150,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-22",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-22",
 				"item_number": "22",
 				"architect_number": "22",
 				"template":"ALU-NSHWIN-001",
@@ -2257,7 +2257,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-23",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-23",
 				"item_number": "23",
 				"architect_number": "23",
 				"template":"ALU-NSHWIN-001",
@@ -2364,7 +2364,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-24",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-24",
 				"item_number": "24",
 				"architect_number": "24",
 				"template":"ALU-NSHWIN-001",
@@ -2471,7 +2471,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-25",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-25",
 				"item_number": "25",
 				"architect_number": "25",
 				"template":"ALU-NSHWIN-001",
@@ -2569,7 +2569,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-26",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-26",
 				"item_number": "26",
 				"architect_number": "26",
 				"template":"ALU-NSHWIN-001",
@@ -2673,7 +2673,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-27",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-27",
 				"item_number": "27",
 				"architect_number": "27",
 				"template":"ALU-NSHWIN-001",
@@ -2777,7 +2777,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-28",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-28",
 				"item_number": "28",
 				"architect_number": "28",
 				"template":"ALU-NSHWIN-001",
@@ -2881,7 +2881,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-29",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-29",
 				"item_number": "29",
 				"architect_number": "29",
 				"template":"ALU-NSHWIN-001",
@@ -2985,7 +2985,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-30",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-30",
 				"item_number": "30",
 				"architect_number": "30",
 				"template":"ALU-NSHWIN-001",
@@ -3089,7 +3089,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-31",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-31",
 				"item_number": "31",
 				"architect_number": "31",
 				"template":"ALU-NSHWIN-001",
@@ -3193,7 +3193,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-32",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-32",
 				"item_number": "32",
 				"architect_number": "32",
 				"template":"ALU-NSHWIN-001",
@@ -3297,7 +3297,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-33",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-33",
 				"item_number": "33",
 				"architect_number": "33",
 				"template":"ALU-NSHWIN-001",
@@ -3401,7 +3401,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-34",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-34",
 				"item_number": "34",
 				"architect_number": "34",
 				"template":"ALU-NSHWIN-001",
@@ -3505,7 +3505,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-35",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-35",
 				"item_number": "35",
 				"architect_number": "35",
 				"template":"ALU-NSHWIN-001",
@@ -3609,7 +3609,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-36",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-36",
 				"item_number": "36",
 				"architect_number": "36",
 				"template":"ALU-NSHWIN-001",
@@ -3713,7 +3713,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-37",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-37",
 				"item_number": "37",
 				"architect_number": "37",
 				"template":"ALU-NSHWIN-001",
@@ -3817,7 +3817,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-38",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-38",
 				"item_number": "38",
 				"architect_number": "38",
 				"template":"ALU-NSHWIN-001",
@@ -3921,7 +3921,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-39",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-39",
 				"item_number": "39",
 				"architect_number": "39",
 				"template":"ALU-NSHWIN-001",
@@ -4025,7 +4025,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-40",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-40",
 				"item_number": "40",
 				"architect_number": "40",
 				"template":"ALU-NSHWIN-001",
@@ -4129,7 +4129,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-41",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-41",
 				"item_number": "41",
 				"architect_number": "41",
 				"template":"ALU-NSHWIN-001",
@@ -4233,7 +4233,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-42",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-42",
 				"item_number": "42",
 				"architect_number": "42",
 				"template":"ALU-NSHWIN-001",
@@ -4337,7 +4337,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-43",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-43",
 				"item_number": "43",
 				"architect_number": "43",
 				"template":"ALU-NSHWIN-001",
@@ -4441,7 +4441,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-44",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-44",
 				"item_number": "44",
 				"architect_number": "44",
 				"template":"ALU-NSHWIN-001",
@@ -4545,7 +4545,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-45",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-45",
 				"item_number": "45",
 				"architect_number": "45",
 				"template":"ALU-NSHWIN-001",
@@ -4649,7 +4649,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-46",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-46",
 				"item_number": "46",
 				"architect_number": "46",
 				"template":"ALU-NSHWIN-001",
@@ -4753,7 +4753,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-47",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-47",
 				"item_number": "47",
 				"architect_number": "47",
 				"template":"ALU-NSHWIN-001",
@@ -4857,7 +4857,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-48",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-48",
 				"item_number": "48",
 				"architect_number": "48",
 				"template":"ALU-NSHWIN-001",
@@ -4961,7 +4961,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-49",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-49",
 				"item_number": "49",
 				"architect_number": "49",
 				"template":"ALU-NSHWIN-001",
@@ -5065,7 +5065,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number":"ALU-NSHWIN-001_Q241023-001A-50",
+				"full_item_number":"ALU-NSHWIN-001_Q241023-001A-50",
 				"item_number": "50",
 				"architect_number": "50",
 				"template":"ALU-NSHWIN-001",

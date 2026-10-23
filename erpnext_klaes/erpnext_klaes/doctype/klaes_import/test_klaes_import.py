@@ -28,8 +28,8 @@ from erpnext_klaes.erpnext_klaes.doctype.klaes_import.klaes_items import (
 	ATTRIBUTES,
 	COLONIAL,
 	COLOR,
+	FULL_ITEM_NUMBER,
 	HEIGHT,
-	SAP_NUMBER,
 	WIDTH,
 )
 from erpnext_klaes.install import GENERIC_CUSTOMER, GENERIC_CUSTOMER_NAME, create_generic_customer
@@ -54,10 +54,10 @@ def read_test_file(file_name):
 		return f.read().decode("utf-8-sig")
 
 
-def make_klaes_item(sap_number, quantity=1, **changes):
+def make_klaes_item(full_item_number, quantity=1, **changes):
 	"""One item of a Klaes JSON, with the fields the import uses. `changes` overrides any field."""
 	klaes_item = {
-		"SAP_Item_Number": sap_number,
+		"full_item_number": full_item_number,
 		"item_number": "1",
 		"template": TEST_TEMPLATE,
 		"item_group_name": "FG - Test",
@@ -250,7 +250,7 @@ class IntegrationTestKlaesImport(IntegrationTestCase):
 		self.assertEqual(
 			get_attributes("_Test-KL-VAR-1"),
 			{
-				SAP_NUMBER: "_Test-KL-VAR-1",
+				FULL_ITEM_NUMBER: "_Test-KL-VAR-1",
 				HEIGHT: "1200.5",
 				WIDTH: "900.0",
 				COLOR: "_Test White",
@@ -352,15 +352,15 @@ class IntegrationTestKlaesImport(IntegrationTestCase):
 		"""Check one line per Klaes item, in the same order, with the same item and quantity."""
 		self.assertEqual(len(erpnext_document.items), len(klaes_items))
 		for line, klaes_item in zip(erpnext_document.items, klaes_items, strict=True):
-			self.assertEqual(line.item_code, klaes_item["SAP_Item_Number"])
+			self.assertEqual(line.item_code, klaes_item["full_item_number"])
 			self.assertEqual(line.qty, klaes_item["quantity"])
 
 	def check_variants(self, klaes_items):
 		"""Check that every Klaes item is a variant of its template."""
 		for klaes_item in klaes_items:
-			item_code = klaes_item["SAP_Item_Number"]
+			item_code = klaes_item["full_item_number"]
 			self.assertEqual(frappe.db.get_value("Item", item_code, "variant_of"), klaes_item["template"])
-			self.assertEqual(get_attributes(item_code)[SAP_NUMBER], item_code)
+			self.assertEqual(get_attributes(item_code)[FULL_ITEM_NUMBER], item_code)
 
 	def test_real_klaes_quotation_file(self):
 		klaes_json = read_test_file("Q241023-001A_ItemsList.JSON")
@@ -382,7 +382,7 @@ class IntegrationTestKlaesImport(IntegrationTestCase):
 		self.assertEqual(
 			get_attributes("ALU-NSHWIN-001_Q241023-001A-2"),
 			{
-				SAP_NUMBER: "ALU-NSHWIN-001_Q241023-001A-2",
+				FULL_ITEM_NUMBER: "ALU-NSHWIN-001_Q241023-001A-2",
 				HEIGHT: "1828.8",
 				WIDTH: "1219.2",
 				COLOR: "White Powder Coat",

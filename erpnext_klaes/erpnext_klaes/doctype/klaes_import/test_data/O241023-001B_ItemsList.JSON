@@ -10,7 +10,7 @@
 		"delivery_location": null,
 		"item": [
 			{
-				"SAP_Item_Number": "ALU-NSHWIN-001_Q241023-001A-2",
+				"full_item_number": "ALU-NSHWIN-001_Q241023-001A-2",
 				"item_number": "2",
 				"architect_number": "2",
 				"template": "ALU-NSHWIN-001",
@@ -561,7 +561,7 @@
 				]
 			},
 			{
-				"SAP_Item_Number": "ALU-NSHWIN-001_Q241023-001A-3",
+				"full_item_number": "ALU-NSHWIN-001_Q241023-001A-3",
 				"item_number": "3",
 				"architect_number": "3",
 				"template": "ALU-NSHWIN-001",

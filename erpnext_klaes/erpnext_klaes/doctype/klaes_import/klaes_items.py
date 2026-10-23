@@ -2,7 +2,7 @@
 Items of the Klaes JSON (step 3).
 
 Each Klaes item becomes a VARIANT of its template (field "template" in the JSON):
-- Item Code = SAP_Item_Number, Item Name = short_description, Description = long_description
+- Item Code = full_item_number, Item Name = short_description, Description = long_description
 - 5 attributes, read from the Klaes item (see get_attribute_values below)
 - the variant copies the rest from its template (item group, unit...), as usual in ERPNext
 
@@ -12,7 +12,7 @@ Created automatically when missing:
 - the 5 Item Attributes (Stock > Item Attribute)
 - the template item: "Has Variants" ticked, with the 5 attributes,
   item group = item_group_name of the JSON if it exists in ERPNext, otherwise "All Item Groups"
-- new values of the list attributes (each new SAP number, each new color)
+- new values of the list attributes (each new full item number, each new color)
 """
 
 import frappe
@@ -20,12 +20,12 @@ from erpnext.controllers.item_variant import create_variant
 from frappe.utils import flt
 
 # The 5 variant attributes (names of the Item Attributes in ERPNext)
-SAP_NUMBER = "Klaes SAP Item Number"
+FULL_ITEM_NUMBER = "Klaes Full Item Number"
 HEIGHT = "Klaes Height"
 WIDTH = "Klaes Width"
 COLOR = "Klaes Color"
 COLONIAL = "Klaes Colonial"
-ATTRIBUTES = [SAP_NUMBER, HEIGHT, WIDTH, COLOR, COLONIAL]
+ATTRIBUTES = [FULL_ITEM_NUMBER, HEIGHT, WIDTH, COLOR, COLONIAL]
 
 # Number attributes: no list of values, any number in this range (in mm, 2 decimals)
 NUMBER_ATTRIBUTES = {HEIGHT, WIDTH}
@@ -38,7 +38,7 @@ FIXED_VALUES = {COLONIAL: ["Yes", "No"]}
 def get_attribute_values(klaes_item):
 	"""Return {attribute: value} of a Klaes item. Empty values are left out."""
 	values = {
-		SAP_NUMBER: klaes_item["SAP_Item_Number"],
+		FULL_ITEM_NUMBER: klaes_item["full_item_number"],
 		HEIGHT: str(flt(klaes_item["height"])) if klaes_item.get("height") is not None else None,
 		WIDTH: str(flt(klaes_item["width"])) if klaes_item.get("width") is not None else None,
 		COLOR: klaes_item.get("color"),
@@ -56,7 +56,7 @@ def create_or_update_items(document):
 
 def create_or_update_item(klaes_item):
 	"""Create the variant of one Klaes item, or update it if it already exists."""
-	item_code = klaes_item["SAP_Item_Number"]
+	item_code = klaes_item["full_item_number"]
 	template = get_or_create_template(klaes_item)
 
 	values = get_attribute_values(klaes_item)
@@ -101,7 +101,7 @@ def get_or_create_template(klaes_item):
 	"""Return the template of a Klaes item, after creating it (or checking it) if needed."""
 	template = (klaes_item.get("template") or "").strip()
 	if not template:
-		frappe.throw(f"Item '{klaes_item['SAP_Item_Number']}' has no template in the Klaes JSON.")
+		frappe.throw(f"Item '{klaes_item['full_item_number']}' has no template in the Klaes JSON.")
 
 	if frappe.db.exists("Item", template):
 		check_template(template)
@@ -168,7 +168,7 @@ def get_or_create_attribute(attribute):
 
 
 def add_attribute_value(attribute, value):
-	"""Add a value to a list attribute (e.g. a new SAP number or a new color) if it is not there yet."""
+	"""Add a value to a list attribute (e.g. a new full item number or a new color) if it is not there yet."""
 	get_or_create_attribute(attribute)
 	if attribute in NUMBER_ATTRIBUTES:
 		return  # number attributes have no list of values

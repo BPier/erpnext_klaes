@@ -155,11 +155,11 @@ def add_items(erpnext_document, document):
 	"""
 	Add one line per item of the Klaes JSON to a Quotation or Sales Order.
 
-	The Item Code is "SAP_Item_Number" in the JSON.
+	The Item Code is "full_item_number" in the JSON.
 	The items are created before, by create_or_update_items().
 	"""
 	for klaes_item in document.get("item", []):
-		item_code = klaes_item["SAP_Item_Number"]
+		item_code = klaes_item["full_item_number"]
 		if not frappe.db.exists("Item", item_code):
 			frappe.throw(f"Item '{item_code}' does not exist in ERPNext.")
 

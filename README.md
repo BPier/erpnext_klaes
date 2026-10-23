@@ -104,7 +104,7 @@ Anything else (another `doc_type`, or a number that does not match) gives an **E
   in ERPNext, with the standard **Create → Sales Order** button.
 - The Klaes number is saved in the **Klaes Doc Number** field (`klaes_doc_number`) of the Quotation or Sales Order
   (you can filter lists on it). It is carried over when a Sales Order is made from the Quotation.
-- One line per item of the JSON: Item Code = `SAP_Item_Number`, Quantity = `quantity`.
+- One line per item of the JSON: Item Code = `full_item_number`, Quantity = `quantity`.
   ERPNext fills in the rest (name, unit, price, warehouse).
 - The items are created first (step 3), see below.
 - The customer is always the generic customer **`klaes import`** (ID **`C99-9999`**): the sales team
@@ -115,14 +115,14 @@ Anything else (another `doc_type`, or a number that does not match) gives an **E
 
 Each item of the JSON becomes a **variant** of its `template` (e.g. `ALU-NSHWIN-001`):
 
-- Item Code = `SAP_Item_Number`, Item Name = `short_description`,
+- Item Code = `full_item_number`, Item Name = `short_description`,
   Description = `long_description` (one line per `||` part).
 - The variant copies the rest from its template (item group, unit...), as usual in ERPNext.
 - It has 5 attributes:
 
 | JSON field | ERPNext attribute (Stock → Item Attribute) | Type |
 |---|---|---|
-| `SAP_Item_Number` | Klaes SAP Item Number | list: each new SAP number is added |
+| `full_item_number` | Klaes Full Item Number | list: each new full item number is added |
 | `height` | Klaes Height | number, 0 to 100000 (mm), 2 decimals |
 | `width` | Klaes Width | number, 0 to 100000 (mm), 2 decimals |
 | `color` | Klaes Color | list: each new color is added |
@@ -133,7 +133,7 @@ Created automatically when missing:
 - the **template**: "Has Variants" ticked, with the 5 attributes, unit `Nos`, item group = `item_group_name`
   of the JSON if that group exists in ERPNext, otherwise `All Item Groups`.
 
-If the item **already exists** (same `SAP_Item_Number`, e.g. Klaes sends it again), its attributes and
+If the item **already exists** (same `full_item_number`, e.g. Klaes sends it again), its attributes and
 description are **updated** from the new JSON. It must be a variant of the same template, otherwise: Error.
 
 If a template exists but is not set up (Has Variants not ticked, or attributes missing): Error.

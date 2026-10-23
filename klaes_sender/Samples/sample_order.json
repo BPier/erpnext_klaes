@@ -8,7 +8,7 @@
 		"delivery_location": null,
 		"item": [
 			{
-				"SAP_Item_Number": "SAMPLE-WIN-001_O261022-0012-1",
+				"full_item_number": "SAMPLE-WIN-001_O261022-0012-1",
 				"item_number": "1",
 				"template": "SAMPLE-WIN-001",
 				"item_group_name": "FG - NSH",
